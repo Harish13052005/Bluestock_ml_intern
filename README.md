@@ -1,244 +1,70 @@
-# Bluestock ML Financial Analysis Dashboard
+# Getting Started with Create React App
 
-A full‑stack fintech project that fetches real stock fundamentals from Bluestock's API, applies rule‑based ML‑style analysis, stores results in a database, and displays insights on a React dashboard.
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## 1. Architecture Overview
+## Available Scripts
 
-### Backend: Django + Django REST Framework
+In the project directory, you can run:
 
-- Connects to Bluestock company API (`company.php?id={company_id}&api_key=...`).
-- Cleans and aggregates financial data and official pros/cons.
-- Applies rule‑based analyzer to classify companies as GOOD / NEUTRAL / BAD.
-- Stores results in PostgreSQL and exposes REST endpoints.
+### `npm start`
 
-### Database: PostgreSQL
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-- **Company table**: basic info + selected financial metrics.
-- **Analysis table**: health rating, combined pros/cons, timestamp.
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
 
-### Frontend: React + Axios
+### `npm test`
 
-- Single‑page dashboard for entering company symbols (Nifty100).
-- Calls backend APIs and renders cards with Bluestock metrics + ML insights.
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-## 2. Tech Stack
+### `npm run build`
 
-- Python 3.11
-- Django 4.2, Django REST Framework
-- PostgreSQL
-- Requests, python‑dotenv
-- React (create‑react‑app), Axios, CSS
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-## 3. Backend Setup (Django + PostgreSQL)
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-### 3.1 Clone and enter project
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-```bash
-git clone <your-repo-url> bluestock-ml-project
-cd bluestock-ml-project/backend
-```
+### `npm run eject`
 
-### 3.2 Create and activate virtualenv
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-```bash
-# Windows
-python -m venv venv
-venv\Scripts\activate
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-# Linux/Mac
-python -m venv venv
-source venv/bin/activate
-```
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-### 3.3 Install dependencies
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-```bash
-pip install -r requirements.txt
-```
+## Learn More
 
-(If requirements.txt not yet generated, use `pip freeze > requirements.txt` after installing packages.)
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-### 3.4 Configure PostgreSQL
+To learn React, check out the [React documentation](https://reactjs.org/).
 
-Create database and user:
+### Code Splitting
 
-```sql
-CREATE DATABASE bluestock_db;
-CREATE ROLE bluestock_user WITH LOGIN PASSWORD 'your_password';
-GRANT ALL PRIVILEGES ON DATABASE bluestock_db TO bluestock_user;
-```
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-In `bluestock_config/settings.py`:
+### Analyzing the Bundle Size
 
-```python
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "bluestock_db",
-        "USER": "bluestock_user",
-        "PASSWORD": "your_password",
-        "HOST": "127.0.0.1",
-        "PORT": "5432",
-    }
-}
-```
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
-### 3.5 Environment variables
+### Making a Progressive Web App
 
-Create `.env` in `backend/`:
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
 
-```
-API_KEY=your_bluestock_api_key
-```
+### Advanced Configuration
 
-(Optionally DB credentials too if you want.)
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
-### 3.6 Migrations and runserver
+### Deployment
 
-```bash
-python manage.py migrate
-python manage.py runserver
-```
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
 
-Backend runs at `http://127.0.0.1:8000/`.
+### `npm run build` fails to minify
 
-## 4. Frontend Setup (React)
-
-From project root:
-
-```bash
-cd frontend
-npm install
-npm start
-```
-
-Frontend runs at `http://localhost:3000/`.
-
-## 5. API Endpoints
-
-### 5.1 Analyze companies
-
-**URL**: `POST /api/analyze/?format=json`
-
-**Body (JSON)**:
-
-```json
-{
-  "company_ids": ["TCS", "HDFCBANK", "INFY"]
-}
-```
-
-**Response (simplified)**:
-
-```json
-{
-  "status": "success",
-  "count": 3,
-  "results": [
-    {
-      "company_id": "TCS",
-      "company_name": "Tata Consultancy Services Ltd",
-      "health_rating": "NEUTRAL",
-      "pros": ["Company is almost debt free.", "..."],
-      "cons": ["Stock is trading at 15.2 times its book value", "..."],
-      "metrics_summary": {
-        "sales_growth_10y": "10 Years: 11%",
-        "roe_10y": "10 Years: 40%"
-      },
-      "details_url": "https://bluemutualfund.in/app1/pages/company.php?id=TCS"
-    }
-  ]
-}
-```
-
-### 5.2 List stored analyses
-
-**URL**: `GET /api/results/?format=json`
-
-**Description**: Returns all companies stored in the Analysis table along with their latest health rating and pros/cons.
-
-## 6. How the Analysis Works
-
-### Fetch data:
-
-Backend calls Bluestock API for each requested `company_id`.
-
-Parses:
-
-- `company` (name, ROE, etc.)
-- `data.prosandcons` (official pros/cons text)
-- `data.analysis` (10Y / 5Y / 3Y growth & ROE).
-
-### Preprocess / clean:
-
-- Normalize IDs to uppercase.
-- Convert numeric strings to numbers where needed.
-- Remove "NULL" entries from pros/cons.
-
-### Rule‑based analyzer:
-
-Uses ROE, debt, growth and dividend indicators (when available) to generate additional pros/cons and a GOOD / NEUTRAL / BAD health rating.
-
-### Combine & store:
-
-- Merges Bluestock pros/cons with ML pros/cons.
-- Saves Company + Analysis records into PostgreSQL.
-- Return to frontend: React receives `results[]` and renders cards.
-
-## 7. Frontend Features
-
-- Search bar to enter company symbols (e.g., TCS, HDFCBANK, INFY).
-- Chip list to add/remove symbols dynamically.
-- Analyze button to call backend API.
-- Result cards per company showing:
-  - Company name and health badge (GOOD / NEUTRAL / BAD).
-  - Bluestock 10Y Sales and 10Y ROE metrics.
-  - Detailed Pros and Cons lists.
-  - "View full Bluestock analysis →" link opening the official Bluestock page.
-- Filter bar: ALL / GOOD / NEUTRAL / BAD to quickly segment companies.
-
-## 8. Testing
-
-### 8.1 API testing (Postman)
-
-Create requests for:
-
-- `POST /api/analyze/` with valid/invalid bodies.
-- `GET /api/results/`.
-
-Verify:
-
-- HTTP 200 with correct JSON on success.
-- HTTP 400 when `company_ids` is missing or invalid.
-
-### 8.2 UI testing
-
-Test with various symbol sets:
-
-- Single company, many companies, duplicates, invalid ticker.
-
-Check:
-
-- Cards render correctly, no crashes.
-- Filters work.
-- Error banner appears if backend is down.
-
-## 9. Environment Templates
-
-Create `.env.example` in `backend/`:
-
-```
-API_KEY=your_bluestock_api_key
-DB_NAME=bluestock_db
-DB_USER=bluestock_user
-DB_PASSWORD=your_password
-DB_HOST=127.0.0.1
-DB_PORT=5432
-```
-
-## 10. Screenshots
-
-Include images like:
-
-- `docs/dashboard-overview.png` – main dashboard with multiple companies.
-- `docs/good-filter.png` – filter set to GOOD only.
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
